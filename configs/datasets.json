@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "datasets": {
+    "phm2010": {
+      "root_env": "PHM2010_DATA_ROOT",
+      "default_root": "D:/PHM/data",
+      "required_subdirectories": ["c1", "c4", "c6"],
+      "label": "VB",
+      "label_unit": "um",
+      "storage": "external_read_only"
+    },
+    "hannover": {
+      "root_env": "HANNOVER_DATA_ROOT",
+      "default_root": null,
+      "doi": "10.17632/zpxs87bjt8.3",
+      "data_paper_doi": "10.1016/j.dib.2023.109574",
+      "expected_hdf5_runs": 6418,
+      "machines": ["M1", "M2", "M3"],
+      "tools": ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9"],
+      "label": "VB",
+      "label_unit": "um",
+      "storage": "external_read_only"
+    },
+    "nasa_milling": {
+      "root_env": "NASA_MILLING_DATA_ROOT",
+      "default_root": "data/raw/nasa_milling",
+      "filename": "data.parquet",
+      "official_page": "https://data.nasa.gov/dataset/milling-wear",
+      "official_archive": "https://data.nasa.gov/docs/legacy/mill.zip",
+      "transport_mirror": "https://huggingface.co/datasets/jonasmaltebecker/nasa_milling/resolve/main/data.parquet",
+      "sha256": "04819835e2747b9951a0d4415f5d0ce9d339ae6a0985ba3d6098c0b69116b1be",
+      "expected_rows": 167,
+      "label": "VB",
+      "label_unit": "native_unverified",
+      "storage": "project_local_ignored"
+    }
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "audit_date": "2026-07-17",
+  "dataset": "Multivariate time series data of milling processes with varying tool wear and machine tools",
+  "dataset_doi": "10.17632/zpxs87bjt8.3",
+  "article_doi": "10.1016/j.dib.2023.109574",
+  "root_policy": "local_path_omitted",
+  "inventory": {
+    "hdf5_files": 6418,
+    "zero_byte_hdf5_files": 0,
+    "filelist_rows": 8607,
+    "unique_filelist_rows": 6418,
+    "duplicate_filelist_rows": 2189,
+    "filename_multiplicity": {
+      "1": 4260,
+      "2": 2127,
+      "3": 31
+    },
+    "csv_without_hdf5": 0,
+    "hdf5_without_csv": 0
+  },
+  "per_tool_hdf5_files": {
+    "M1_T1": 609,
+    "M1_T2": 609,
+    "M1_T3": 638,
+    "M2_T4": 928,
+    "M2_T5": 928,
+    "M2_T6": 928,
+    "M3_T7": 609,
+    "M3_T8": 560,
+    "M3_T9": 609
+  },
+  "filelist_columns": [
+    "filename",
+    "machine",
+    "tool",
+    "segment",
+    "cumulated_tool_contact_time",
+    "wear"
+  ],
+  "hdf5_label_datasets": {
+    "labels/machine": "int32[1,1]",
+    "labels/tool": "int32[1,1]",
+    "labels/run": "int32[1,1]",
+    "labels/cumulated_tool_contact_time": "float32[1,1]",
+    "labels/wear": "int32[1,1]"
+  },
+  "probe_files": {
+    "M1": "M1T1R100C570VB55.h5",
+    "M2": "M2T4R100C558VB53.h5",
+    "M3": "M3T7R100C568VB48.h5"
+  },
+  "signal_schema": {
+    "common_sensor_25khz": [
+      "signals_sensor/force_sensor_x",
+      "signals_sensor/force_sensor_y",
+      "signals_sensor/force_sensor_z",
+      "signals_sensor/time_sensor"
+    ],
+    "M1_machine_500hz": [
+      "signals_machine/position_control_deviation_axis_x",
+      "signals_machine/position_control_deviation_axis_y",
+      "signals_machine/time_machine",
+      "signals_machine/tool_position_x",
+      "signals_machine/tool_position_y",
+      "signals_machine/tool_position_z",
+      "signals_machine/torque_axis_x",
+      "signals_machine/torque_axis_y",
+      "signals_machine/torque_axis_z",
+      "signals_machine/torque_spindle"
+    ],
+    "M2_M3_machine_500hz": [
+      "signals_machine/force_axis_x",
+      "signals_machine/force_axis_y",
+      "signals_machine/force_axis_z",
+      "signals_machine/position_control_deviation_axis_x",
+      "signals_machine/position_control_deviation_axis_y",
+      "signals_machine/time_machine",
+      "signals_machine/tool_position_x",
+      "signals_machine/tool_position_y",
+      "signals_machine/tool_position_z",
+      "signals_machine/torque_spindle"
+    ]
+  },
+  "units": {
+    "wear": {
+      "canonical": "um",
+      "authority": "article and dataset description",
+      "hdf5_attribute": null
+    },
+    "cumulated_tool_contact_time": {
+      "canonical": "s",
+      "authority": "article label table and filename definition",
+      "hdf5_attribute_observed": "min",
+      "conflict": true
+    }
+  },
+  "label_provenance": {
+    "status": "blocked",
+    "published_rule": "VB measured after one or two workpiece layers, roughly every 40 runs; other runs linearly interpolated by cumulated tool contact time",
+    "per_run_origin_field_present": false,
+    "measured_anchor_identities_published": false,
+    "policy": "do not infer measured anchors from row number or curve shape"
+  },
+  "anomalies": {
+    "M2": [
+      "force_axis and torque_spindle affected by aliasing because the control low-pass filter was disabled"
+    ],
+    "M3_T7_T8": [
+      "workpiece XY coordinate system rotated approximately 1 to 2 degrees relative to machine axes"
+    ],
+    "M3_T8": [
+      "early runs missing; first usable run starts at 177 s cumulative contact time"
+    ],
+    "filelist": [
+      "2189 exact duplicate rows; retain duplicate counts and exclusion reason when deduplicating"
+    ]
+  }
+}

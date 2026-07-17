@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "status": "preregistered_not_yet_executable",
+  "protocol": "configs/experiments/protocol.json",
+  "seeds": [20260512, 20260513, 20260514, 20260515, 20260516],
+  "experiments": [
+    {
+      "dataset": "phm2010",
+      "tasks": "all_6_directed_c1_c4_c6",
+      "methods": ["B0", "B1", "B2", "B3", "M", "M_attn"]
+    },
+    {
+      "dataset": "hannover",
+      "tasks": "all_6_directed_m1_m2_m3",
+      "methods": ["B0", "B2", "B3", "M"]
+    },
+    {
+      "dataset": "nasa_milling",
+      "tasks": "all_8_same_condition_cross_material",
+      "methods": ["B0", "B2", "B3", "M"]
+    }
+  ],
+  "output_root": "outputs/runs/phase2_final"
+}

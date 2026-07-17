@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "task_type": "continuous_raw_vb_regression",
+  "forbid_vb_norm_target": true,
+  "seed_sets": {
+    "smoke": [20260512],
+    "screening": [20260512, 20260513, 20260514],
+    "final": [20260512, 20260513, 20260514, 20260515, 20260516]
+  },
+  "methods": {
+    "B0": "source_only_pgru",
+    "B1": "dann_pgru",
+    "B2": "ddgan_pseudo_pgru",
+    "B3": "dare_gram_pgru",
+    "A1": "B2_generated_reliability",
+    "A2": "B2_soft_lifecycle",
+    "A3": "B2_lifecycle_gram",
+    "M": "rgla_vb",
+    "M_attn": "rgla_vb_feature_attention"
+  },
+  "primary_comparison": ["M", "B2"],
+  "selection_metric": "source_grouped_validation_mae",
+  "evaluation_metrics": [
+    "mae",
+    "rmse",
+    "r2",
+    "pearson",
+    "endpoint_error",
+    "high_wear_mae",
+    "monotonic_violations",
+    "nmae",
+    "nrmse"
+  ],
+  "integrity": {
+    "target_evaluation_labels_visible_during_training": false,
+    "fit_scaler_on_source_only": true,
+    "split_group_before_windowing": true,
+    "report_all_registered_seeds": true
+  }
+}

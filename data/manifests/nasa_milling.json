@@ -1,0 +1,18 @@
+{
+  "dataset_id": "nasa_milling",
+  "authority": "NASA Ames Prognostics Center of Excellence",
+  "official_page": "https://data.nasa.gov/dataset/milling-wear",
+  "official_archive": "https://data.nasa.gov/docs/legacy/mill.zip",
+  "transport_source": "https://huggingface.co/datasets/jonasmaltebecker/nasa_milling/resolve/main/data.parquet",
+  "transport_note": "Mirror is used only for delivery because the official legacy endpoint failed TLS/redirect handling on this workstation.",
+  "local_file": "data/raw/nasa_milling/data.parquet",
+  "sha256": "04819835e2747b9951a0d4415f5d0ce9d339ae6a0985ba3d6098c0b69116b1be",
+  "bytes": 13773426,
+  "rows": 167,
+  "cases": 16,
+  "measured_vb_rows": 146,
+  "missing_vb_rows": 21,
+  "signal_columns": ["smcAC", "smcDC", "vib_table", "vib_spindle", "AE_table", "AE_spindle"],
+  "verification_date": "2026-07-17",
+  "verification_status": "checksum_verified_schema_inspected"
+}

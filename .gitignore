@@ -1,0 +1,24 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.idea/
+.vscode/
+.env
+
+data/raw/**
+data/external/**
+data/processed/**
+data/PHM/
+data/Multivariate time series data of milling processes with varying tool wear and machine tools/
+!data/raw/.gitkeep
+!data/external/.gitkeep
+!data/processed/.gitkeep
+outputs/**
+!outputs/.gitkeep
+
+*.pt
+*.pth
+*.ckpt
+*.npz
+*.parquet

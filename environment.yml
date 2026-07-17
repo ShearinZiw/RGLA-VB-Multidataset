@@ -1,0 +1,14 @@
+name: rgla-vb-multidataset
+channels:
+  - defaults
+dependencies:
+  - python=3.12
+  - numpy
+  - pandas
+  - pyarrow
+  - h5py
+  - scipy
+  - scikit-learn
+  - matplotlib
+  - pytorch
+  - pytest

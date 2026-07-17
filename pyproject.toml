@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rgla-vb"
+version = "0.1.0"
+description = "Reliability-gated lifecycle-aware continuous tool-wear regression"
+requires-python = ">=3.12"
+dependencies = [
+  "numpy",
+  "pandas",
+  "pyarrow",
+  "h5py",
+  "scipy",
+  "scikit-learn",
+  "matplotlib",
+  "torch"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
