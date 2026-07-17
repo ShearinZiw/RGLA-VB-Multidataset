@@ -7,10 +7,14 @@
 ```text
 dataset_id, domain_id, machine_id, tool_id, material_id,
 condition_id, sequence_id, progress_value, progress_type,
-vb_value, vb_unit, vb_um, label_mask, label_origin
+vb_value, vb_unit, vb_um, label_mask, label_origin,
+eol_index, eol_origin, rul_cut, rul_contact_s, rul_label_mask,
+censoring_type
 ```
 
 `vb_value` 保存发布数据中的原值；只有单位由权威说明核验后才填写 `vb_um`。`label_origin` 只能是 `measured`、`provider_interpolated` 或 `missing`。
+
+`eol_origin` 只能是 `provider_eol`、`preregistered_threshold`、`censored` 或 `unavailable`。`rul_label_mask=1` 只允许出现在可审计 EOL 的完整寿命区间；最后观测点不是默认 EOL。
 
 ## 2. PHM2010
 
@@ -114,7 +118,7 @@ NASA 某些 case 极短，例如 case 6 只有一个 run。因此：
 - C1、C4、C6 各有 315 个连续编号的传感器 CSV 和 315 行磨损表，共 945 个信号文件与 3 个磨损文件；未发现缺号或零字节文件。
 - 单个信号 CSV 为无表头七通道数值序列；磨损表字段为 `cut,1,2,3`。本轮只确认结构完整，不启动另一个 adapter 任务，也不改变其原始 VB 回归定义。
 
-## 7. 刀具 RUL 评估扩展方案
+## 7. VB/RUL 双回归标签协议
 
 ### Material Passport
 
@@ -122,28 +126,30 @@ NASA 某些 case 极短，例如 case 6 只有一个 run。因此：
 - Origin Mode: plan
 - Origin Date: 2026-07-17
 - Verification Status: UNVERIFIED（尚未执行；数据结构和 Hannover 来源说明已核验）
-- Version Label: tool_rul_plan_v1
+- Version Label: tool_rul_joint_v2
 
 ### 7.1 目标与任务边界
 
-主训练任务仍是连续原始 `VB` 回归。RUL 只是对预测磨损轨迹的派生评估，不新增 RUL 训练标签、不改成分类、不使用 `VB_norm`。对接触时间为 `c` 的样本，给定预注册失效阈值 `VB_EOL`，定义：
+连续原始 `VB` 与 `RUL-cut` 是同等地位的两个训练目标。对存在可验证 EOL 的第 `e` 次走刀：
 
 ```text
-tau_hat(c) = inf {u >= c | VB_hat(u) >= VB_EOL}
-RUL_hat(c) = max(0, tau_hat(c) - c)
+rul_cut(e) = max(0, e_EOL - e)
 ```
 
-Hannover 的 `VB_EOL` 预注册为发布方定义的约 150 µm；该阈值只用于阈值穿越评估，模型仍输出 µm 单位的连续 `VB`。其他数据集只有在来源单位和失效阈值分别记录后才能启用 RUL 评估，禁止直接照搬 150 µm。
+`e_EOL` 优先采用提供方定义的生命周期终点；只有单位、阈值和首次穿越位置均可复核时，才能采用预注册阈值 EOL。`VB=150 µm` 作为统一敏感性规则单独报告，不能无记录地替代主 EOL。模型仍输出原始单位 `VB` 和走刀次数 `RUL-cut`，不使用 `VB_norm`。
+
+若生命周期为右删失、提前停机、左截断后缺少可靠 EOL，或数据集本身不是 run-to-failure，则 `rul_label_mask=0`。这类样本可以用于 VB 监督和无标签域适应，不能用最后 run 伪造 RUL。
 
 ### 7.2 实验设计
 
-1. 先按完整 tool/case/machine identity 划分，再生成窗口；同一刀具生命周期不得跨训练和测试。
-2. UDA 训练期间，目标域 VB、失效时刻和 RUL 全部隐藏；scaler、特征选择、轨迹拟合超参数、checkpoint 和 early stopping 只使用源训练/源验证数据。
-3. 预测序列先在原始 VB 单位上做非下降轨迹约束，再计算首次阈值穿越；预测在观测范围内不穿越阈值时记为右删失，不强行填入最后一个 run。
-4. 预注册观察点为各目标刀具可评价寿命的 30%、50%、70%；这三个位置只在最终评价阶段由目标标签生成，不能用于训练或模型选择。
-5. 主指标为 measured-only 的 VB MAE/RMSE 和 RUL MAE（秒）；辅指标为 RUL 相对绝对误差、阈值穿越提前/滞后偏差和删失率。先逐目标 tool 计算，再做宏平均。
-6. Hannover 在逐 run 标签来源得到解决前，不得报告 measured-only 主指标。现有发布方插值标签只能作为明确标注的次要敏感性分析，不能替代主结果。
+1. 先按完整 tool/case/machine identity 划分，再生成窗口和执行生命周期局部增强；同一刀具生命周期不得跨训练和测试。
+2. UDA 训练期间，目标域 VB、EOL、RUL 和删失结局全部隐藏；scaler、特征选择、增强邻域、Teacher 方差标尺、checkpoint 和 early stopping 只使用源训练/源验证数据。
+3. PHM2010：在数据集 EOL 来源表完成后启用 `RUL-cut`；三把开发刀具不得仅因为都含 315 cuts 就自动把 cut 315 当作失效，必须记录主 EOL 来源。150 µm 首穿作为敏感性终点。
+4. Hannover：提供方约 150 µm 的停止规则与每把工具最终记录必须逐工具核对。T8 左截断不删除；其可见区间可以计算“到提供方 EOL 的剩余走刀”，但不能补造缺失早期 RUL。`rul_contact_s` 作为次要指标。
+5. NASA：现有 16 case 不能证明均为 run-to-failure，默认 `rul_label_mask=0`、`eol_origin=censored`。NASA 只承担 VB 跨材料压力测试和删失鲁棒性检查。
+6. VB 主指标为原始单位 MAE/RMSE；RUL 主指标为 `RUL-cut` MAE/RMSE。二者都先逐目标 tool/case 计算再做宏平均，不能用一个混合分数掩盖其中一个任务恶化。
+7. Hannover 在逐 run VB 标签来源得到解决前，不得把发布方插值点冒充 measured-only VB 主指标；这不影响对明确 EOL 来源和 RUL mask 的独立审计。
 
 ### 7.3 预期产物与审计
 
-每次实验必须写出 resolved config、seed、git status、VB 与 RUL 预测、逐 tool 指标、阈值与单位来源、删失标志，以及 `label_visibility_audit.json`。审计必须证明目标评价标签没有进入缩放、特征选择、伪标签、checkpoint 选择或 early stopping。
+每次实验必须写出 resolved config、seed、git status、VB 与 RUL 预测、逐 tool 指标、EOL/阈值/单位来源、RUL mask、删失标志、Teacher 不确定性以及 `label_visibility_audit.json`。审计必须证明目标评价标签没有进入缩放、特征选择、增强、Teacher、checkpoint 选择或 early stopping。

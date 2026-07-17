@@ -4,14 +4,15 @@ This project will be implemented in small tasks by cost-efficient coding models.
 
 ## Non-negotiable invariants
 
-1. The prediction task is continuous raw `VB` regression. Never convert it to classification.
+1. The primary method is joint continuous raw `VB` and `RUL-cut` regression wherever a verifiable EOL exists. Never convert either target to classification. Explicitly named legacy baselines may remain VB-only for reproducibility.
 2. Never use `VB_norm` as the training target. Unit conversion to `vb_um` is allowed only when the source unit is recorded.
-3. Target-domain labels are unavailable during UDA training. Evaluation labels must not enter scaling, feature selection, pseudo-labeling, checkpoint selection, or early stopping.
+3. Target-domain labels are unavailable during UDA training. Evaluation `VB`, `RUL`, EOL, and censoring outcomes must not enter scaling, feature selection, augmentation, teacher weighting, checkpoint selection, or early stopping.
 4. Split by complete tool/case/machine identities before creating windows. Never split windows from one lifecycle across train and test.
 5. Fit scalers and feature selectors on source training data only.
 6. Do not modify `legacy/scripts/` unless the current task explicitly lists an allowed legacy file.
 7. Do not silently drop Hannover T8, machine-2 aliased channels, missing NASA labels, or failed runs. Record exclusions with a reason.
 8. Every experiment must write its resolved config, seed, git status, metrics, predictions, and label-visibility audit.
+9. Create `RUL-cut` labels only from a documented provider EOL or another preregistered, auditable EOL rule. Never treat the last observed run as failure when the lifecycle is censored or incomplete.
 
 ## Task protocol
 

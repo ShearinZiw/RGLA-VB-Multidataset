@@ -1,40 +1,61 @@
 {
-  "schema_version": 1,
-  "task_type": "continuous_raw_vb_regression",
-  "forbid_vb_norm_target": true,
+  "schema_version": 2,
+  "task_type": "joint_continuous_raw_vb_rul_cut_regression",
+  "targets": {
+    "vb": {
+      "continuous": true,
+      "raw_unit_output": true,
+      "forbid_vb_norm_target": true
+    },
+    "rul_cut": {
+      "continuous": true,
+      "requires_audited_eol": true,
+      "mask_censored_or_unavailable": true
+    }
+  },
   "seed_sets": {
     "smoke": [20260512],
     "screening": [20260512, 20260513, 20260514],
     "final": [20260512, 20260513, 20260514, 20260515, 20260516]
   },
   "methods": {
-    "B0": "source_only_pgru",
-    "B1": "dann_pgru",
-    "B2": "ddgan_pseudo_pgru",
-    "B3": "dare_gram_pgru",
-    "A1": "B2_generated_reliability",
-    "A2": "B2_soft_lifecycle",
-    "A3": "B2_lifecycle_gram",
-    "M": "rgla_vb",
-    "M_attn": "rgla_vb_feature_attention"
+    "B0_VB": "source_only_pgru_single_vb",
+    "B2_VB": "ddgan_hard_pseudo_pgru_single_vb",
+    "B3_VB": "dare_gram_pgru_single_vb",
+    "C0_GRU": "multiscale_lifecycle_gru_dual_head_source_only",
+    "C0": "multiscale_lifecycle_tcn_dual_head_source_only",
+    "A1_LOCAL": "C0_lifecycle_local_augmentation",
+    "A2_DARE": "C0_dare_gram",
+    "A3_RGLA": "C0_rgla_no_teacher",
+    "A4_MT": "C0_uncertainty_ema_teacher_no_alignment",
+    "M_NO_MT": "C0_local_augmentation_rgla",
+    "M": "C0_local_augmentation_rgla_uncertainty_ema_teacher",
+    "M_DDGAN": "M_with_ddgan_replacing_local_augmentation"
   },
-  "primary_comparison": ["M", "B2"],
-  "selection_metric": "source_grouped_validation_mae",
-  "evaluation_metrics": [
-    "mae",
-    "rmse",
-    "r2",
-    "pearson",
-    "endpoint_error",
-    "high_wear_mae",
-    "monotonic_violations",
-    "nmae",
-    "nrmse"
+  "primary_comparisons": [
+    ["M", "C0"],
+    ["M", "M_NO_MT"],
+    ["C0", "C0_GRU"],
+    ["M", "B2_VB"]
   ],
+  "selection": {
+    "scope": "source_grouped_validation_only",
+    "dual_task_rule": "minimum_mean_rank_of_vb_mae_and_rul_cut_mae",
+    "vb_only_rule": "minimum_vb_mae"
+  },
+  "evaluation_metrics": {
+    "vb": ["mae", "rmse", "r2", "pearson", "high_wear_mae", "monotonic_violation_rate"],
+    "rul_cut": ["mae", "rmse", "early_late_bias", "coverage", "censoring_rate"],
+    "reliability": ["teacher_vb_variance", "teacher_rul_variance", "teacher_weight", "effective_rgla_stages"],
+    "posthoc_scale_only": ["nmae", "nrmse"]
+  },
   "integrity": {
-    "target_evaluation_labels_visible_during_training": false,
-    "fit_scaler_on_source_only": true,
-    "split_group_before_windowing": true,
-    "report_all_registered_seeds": true
+    "target_evaluation_vb_rul_eol_visible_during_training": false,
+    "fit_scaler_and_selector_on_source_only": true,
+    "fit_augmentation_neighborhood_on_source_train_only": true,
+    "fit_teacher_uncertainty_scale_on_source_only": true,
+    "split_group_before_windowing_and_augmentation": true,
+    "report_all_registered_seeds": true,
+    "write_eol_rul_audit": true
   }
 }

@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "status": "preregistered_not_yet_executable",
   "protocol": "configs/experiments/protocol.json",
   "seeds": [20260512, 20260513, 20260514, 20260515, 20260516],
@@ -7,17 +7,24 @@
     {
       "dataset": "phm2010",
       "tasks": "all_6_directed_c1_c4_c6",
-      "methods": ["B0", "B1", "B2", "B3", "M", "M_attn"]
+      "targets": ["vb", "rul_cut"],
+      "methods": ["B0_VB", "B2_VB", "B3_VB", "C0_GRU", "C0", "M_NO_MT", "M", "M_DDGAN"],
+      "rul_gate": "requires_audited_eol_registry"
     },
     {
       "dataset": "hannover",
       "tasks": "all_6_directed_m1_m2_m3",
-      "methods": ["B0", "B2", "B3", "M"]
+      "targets": ["vb", "rul_cut"],
+      "methods": ["B0_VB", "B2_VB", "B3_VB", "C0", "M_NO_MT", "M"],
+      "vb_gate": "provider_interpolated_secondary_until_measured_anchors_verified",
+      "rul_gate": "requires_per_tool_eol_origin_audit"
     },
     {
       "dataset": "nasa_milling",
       "tasks": "all_8_same_condition_cross_material",
-      "methods": ["B0", "B2", "B3", "M"]
+      "targets": ["vb"],
+      "methods": ["B0_VB", "B2_VB", "C0", "M"],
+      "rul_gate": "disabled_censored_not_run_to_failure"
     }
   ],
   "output_root": "outputs/runs/phase2_final"
